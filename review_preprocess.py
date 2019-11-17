@@ -3,8 +3,8 @@ import numpy as np
 import itertools
 import sys
 import re
-import gc
 import time
+from nltk.corpus import stopwords
 
 def clean_string(s):
     s = s.replace('&amp;',"&")
@@ -17,7 +17,14 @@ def clean_string(s):
     s = re.sub(r'[!]+(?=[!])', r'', s)
     return s
 
-def clean_reviews(df,col_name='review'):
+def clean_lstm(s):
+    stp_wrd = set(stopwords.words('english'))
+    clean_num = re.compile('[^0-9a-z #+_]')
+    s = clean_num.sub('', s)
+    s = ' '.join(word for word in s.split() if word not in stp_wrd) 
+    return s
+
+def clean_reviews(df,col_name='review',is_lstm=False):
     ctr = 0
     df_m = df.copy(deep=True)
     rows,_ = df_m.shape
@@ -30,6 +37,8 @@ def clean_reviews(df,col_name='review'):
             sys.stdout.flush()
         tmp = df_m.iloc[row][col_name].replace('&#039;',"'")
         tmp = clean_string(tmp)
+        if(is_lstm):
+            tmp = clean_lstm(tmp)
         df_m.at[row,'review'] = tmp
     print("Review cleanup Completed...")
     print("Removing row with nan values")
