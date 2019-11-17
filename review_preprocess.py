@@ -18,6 +18,7 @@ def clean_string(s):
     return s
 
 def clean_lstm(s):
+    s = s.lower()
     stp_wrd = set(stopwords.words('english'))
     clean_num = re.compile('[^0-9a-z #+_]')
     s = clean_num.sub('', s)
